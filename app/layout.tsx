@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import "./globals.css";
 import { Providers } from "./provider";
 import SideBar from "./components/side-bar";
@@ -27,15 +28,17 @@ export default function RootLayout({
     <html lang="ar" suppressHydrationWarning>
       <body className={cairo.className}>
         <Providers>
-          <div className=" flex justify-start">
-            <main className=" flex-1">
-              <Header />
-              <Separator />
-              <Breadcrumbs />
-              {children}
-            </main>
-            <SideBar />
-          </div>
+          <AppRouterCacheProvider  options={{ enableCssLayer: true }}>
+            <div className=" flex justify-start">
+              <main className=" flex-1">
+                <Header />
+                <Separator />
+                <Breadcrumbs />
+                {children}
+              </main>
+              <SideBar />
+            </div>
+          </AppRouterCacheProvider>
         </Providers>
       </body>
     </html>

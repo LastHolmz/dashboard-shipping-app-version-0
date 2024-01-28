@@ -1,7 +1,10 @@
+import { TableDemo } from "./temprory";
 
 const usersPage = () => {
   return (
-    <div>users</div>
+    <div>
+      <TableDemo/>
+    </div>
   )
 }
 
