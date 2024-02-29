@@ -3,11 +3,11 @@ import Tab, { TabItem } from "../components/tabs";
 import { Separator } from "@/components/ui/separator";
 
 export const metadata: Metadata = {
-  title: "لوحة تحكم",
-  description: "لوحة تحكم ",
+  title: "لوحة تحكم | الموظفين ",
+  description: "إدارة الموظفين",
 };
 
-export default function StorageLayout({
+export default function EmployeeLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -15,11 +15,10 @@ export default function StorageLayout({
   return (
     <main className="px-2 h-screen">
       <Tab>
-        <TabItem href="storage" content="تلقائي" />
-        <TabItem href="storage/products" content="المنتجات" />
-        <TabItem href="storage/orders" content="الطلبات" />
+        <TabItem href="employee" content="تلقائي" />
+        {/* <TabItem href="employee/new" content="إضافة موظف" />{" "} */}
       </Tab>
-      <Separator/>
+      <Separator />
       {children}
     </main>
   );

@@ -1,0 +1,311 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String        @id @default(auto()) @map("_id") @db.ObjectId
+  email             String?       @unique
+  firstName         String
+  userName          String        @unique
+  lastName          String
+  phoneNumber       Int
+  verified          Boolean       @default(false)
+  FollowedStores    Store[]       @relation("FollowedBy", fields: [followedStoresIDs], references: [id])
+  followedStoresIDs String[]      @db.ObjectId
+  comment           Comment[]
+  rate              Rate[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  like              Like[]
+  role              Role          @default(Default)
+  userInfo          UserInfo?
+  messagesSent      Message[]     @relation("SentMessage")
+  messagesReceived  Message[]     @relation("ReceivedMessage")
+  hashedPassword    String
+  productLike       ProductLike[]
+  store             Store?
+  Order             Order[]
+}
+
+model Order {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  OrderItems OrderItem[]
+  location   Location?
+  Cities     Cities?     @relation(fields: [citiesId], references: [id])
+  citiesId   String?     @db.ObjectId
+  items      Int?        @default(0)
+  totalPrice Int?        @default(0)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  state      OrderState? @default(UnderReview)
+  user       User?       @relation(fields: [userId], references: [id])
+  userId     String?     @db.ObjectId
+  barcode    String      @unique
+}
+
+model OrderItem {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  productId String  @db.ObjectId
+  skuId     String  @db.ObjectId
+  qty       Int
+  price     Int
+  Order     Order?  @relation(fields: [orderId], references: [id])
+  orderId   String? @db.ObjectId
+}
+
+model UserInfo {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  verfivicationImgs String[]
+  birthday          DateTime?
+  info              String?
+  location          Location? @relation(fields: [locationId], references: [id])
+  user              User?     @relation(fields: [userId], references: [id])
+  userId            String?   @unique @db.ObjectId
+  locationId        String?   @unique @db.ObjectId
+}
+
+model Location {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  city     String?
+  region   String?
+  street   String?
+  info     String?
+  userInfo UserInfo?
+  Order    Order?    @relation(fields: [orderId], references: [id])
+  orderId  String?   @unique @db.ObjectId
+}
+
+model Store {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  ads             Ads?
+  name            String
+  logo            String?
+  backgroundColor String?
+  bio             String?
+  views           Int       @default(0)
+  like            Like[]
+  followedBy      User[]    @relation("FollowedBy", fields: [followedByIDs], references: [id])
+  followedByIDs   String[]  @db.ObjectId
+  products        Product[]
+  comment         Comment[]
+  Rate            Rate[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  owener          User?     @relation(fields: [owenerId], references: [id])
+  owenerId        String    @unique @db.ObjectId
+  verified        Boolean   @default(false)
+}
+
+model Product {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  store         Store?        @relation(fields: [storeId], references: [id])
+  storeId       String?       @db.ObjectId
+  name          String
+  description   String?
+  originalPrice Int?
+  price         Int
+  img           String
+  views         Int           @default(0)
+  sku           Sku[]
+  categories    Category[]
+  discount      Discount?     @relation(fields: [discountId], references: [id])
+  discountId    String?       @unique @db.ObjectId
+  likes         Like[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  ProductLike   ProductLike[]
+  accepted      Boolean       @default(false)
+  barcode       String        @unique
+  sizes         Size[]
+}
+
+model Size {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId String?  @db.ObjectId
+  sku       Sku[]
+  name      String
+}
+
+model ProductLike {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?  @db.ObjectId
+}
+
+model Discount {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  value      Int
+  ratio      Int
+  expiration DateTime
+  Product    Product?
+}
+
+model Category {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  img       String?
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?  @db.ObjectId
+}
+
+model Sku {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  img       String?
+  video     String?
+  color     String
+  product   Product?     @relation(fields: [productId], references: [id])
+  productId String?      @db.ObjectId
+  verified  ProductState @default(Pending)
+  Size      Size?        @relation(fields: [sizeId], references: [id])
+  sizeId    String?      @db.ObjectId
+  qty       Int          @default(0)
+  name      String?      @default("تلقائي")
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  contern   String
+  store     Store?   @relation(fields: [storeId], references: [id])
+  storeId   String?  @db.ObjectId
+  user      User?    @relation(fields: [storeId], references: [id])
+  userId    String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Rate {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  store   Store?  @relation(fields: [storeId], references: [id])
+  storeId String? @db.ObjectId
+  user    User?   @relation(fields: [storeId], references: [id])
+  userId  String? @db.ObjectId
+  stars   Stars
+}
+
+model Ads {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  imgs      String[]
+  store     Store?   @relation(fields: [storeId], references: [id])
+  storeId   String?  @unique @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  store     Store?   @relation(fields: [storeId], references: [id])
+  storeId   String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?  @db.ObjectId
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId String?  @db.ObjectId
+}
+
+model Message {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  sender     User?   @relation("SentMessage", fields: [senderId], references: [id])
+  receiver   User?   @relation("ReceivedMessage", fields: [receiverId], references: [id])
+  senderId   String? @unique @db.ObjectId
+  receiverId String? @unique @db.ObjectId
+}
+
+model Cities {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  min    Int     @default(1)
+  max    Int     @default(3)
+  name   String
+  gender Gender  @default(Man)
+  price  Int     @default(5)
+  Order  Order[]
+}
+
+model Employee {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  fullName        String
+  verifactionImgs String[]
+  role            EmployeeRole @default(Employee)
+  phoneNumber     Int
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  Salaries        Salary[]
+  Debts           Debt[]
+  //last salary date let's keep savin it when ever add new salary update it with new date value
+  lastSalaryDate  DateTime?
+  salaryAmount    Int?         @default(0)
+}
+
+model Salary {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  amount     Int
+  status     SalaryStatus @default(Pended)
+  Employee   Employee?    @relation(fields: [employeeId], references: [id])
+  employeeId String?      @db.ObjectId
+}
+
+model Debt {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  amount     Int
+  Employee   Employee?  @relation(fields: [employeeId], references: [id])
+  employeeId String?    @db.ObjectId
+  status     DebtStatus @default(Still)
+}
+
+enum DebtStatus {
+  //still didn't return the money back
+  Still
+  Retured
+}
+
+enum SalaryStatus {
+  Pended
+  Taken
+}
+
+enum EmployeeRole {
+  Manger
+  Admin
+  Employee
+}
+
+enum Gender {
+  Man
+  Woman
+}
+
+enum OrderState {
+  UnderReview
+  Processing
+  Enroute
+  Delivered
+}
+
+enum Role {
+  Default
+  Seller
+  Delivery
+}
+
+enum Stars {
+  Five
+  Four
+  Three
+  Two
+  One
+}
+
+enum ProductState {
+  Pending
+  Working
+}

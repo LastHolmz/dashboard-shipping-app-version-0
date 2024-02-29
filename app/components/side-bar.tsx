@@ -3,18 +3,53 @@ import { Sidebar, Menu, sidebarClasses } from "react-pro-sidebar";
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaMapMarked } from "react-icons/fa";
 import { LuHome } from "react-icons/lu";
 import { cn } from "../../lib/utils";
 import { GrStorage } from "react-icons/gr";
 import { Separator } from "@/components/ui/separator";
 import { usePathname } from "next/navigation";
+import { IoNewspaperOutline } from "react-icons/io5";
+import { btnVariants } from "./variants";
+import { FaCartFlatbed } from "react-icons/fa6";
+import { CiUser } from "react-icons/ci";
+
+const NavItem = ({
+  pathname,
+  href,
+  collapsed,
+  Icon,
+  name,
+}: {
+  pathname: string;
+  href: string;
+  collapsed: boolean;
+  Icon: React.ReactNode;
+  name: string;
+}) => {
+  return (
+    <>
+      <Link
+        className={`flex justify-center items-center sm:gap-2 w-full rounded-[0px] ${
+          pathname === href || pathname.startsWith(`${href}/`)
+            ? btnVariants.variant.default
+            : btnVariants.variant.link
+        } ${btnVariants.size.default}`}
+        href={href}
+      >
+        {Icon}
+        {!collapsed && <span className="">{name}</span>}
+      </Link>
+      <Separator />
+    </>
+  );
+};
 
 const SideBar = () => {
-    const pathname = usePathname();
+  const pathname = usePathname();
   const [collapsed, setCollapsed] = React.useState<boolean>(false);
   return (
-    <Sidebar  
+    <Sidebar
       rootStyles={{
         [`.${sidebarClasses.container}`]: {
           backgroundColor: "hsl(var(--background))",
@@ -39,41 +74,58 @@ const SideBar = () => {
       <Menu className=" mt-20 ">
         <Separator />
 
-        <Button
-          className=" w-full rounded-[0px] flex flex-end"
-          variant={pathname === "/" ? "default" : "link"}
+        <Link
+          className={`flex justify-center sm:gap-2 w-full rounded-[0px] ${
+            pathname === "/"
+              ? btnVariants.variant.default
+              : btnVariants.variant.link
+          } ${btnVariants.size.default}`}
+          href={"/"}
         >
-          <Link className="flex-between sm:gap-2" href={"/"}>
-            <LuHome />
-            {!collapsed && <span className="">الصفحة الرئيسية</span>}
-          </Link>
-        </Button>
+          <LuHome />
+          {!collapsed && <span className="">الصفحة الرئيسية</span>}
+        </Link>
 
         <Separator />
 
-        <Button
-          className=" w-full rounded-[0px]"
-          variant={pathname === "/products" ? "default" : "link"}
-        >
-          <Link className="flex-between sm:gap-2" href={"/"}>
-            <LuHome />
-            {!collapsed && <span className="">المنتجات</span>}
-          </Link>
-        </Button>
+        <NavItem
+          pathname={pathname}
+          collapsed={collapsed}
+          href="/products"
+          Icon={<FaCartFlatbed />}
+          name="المنتجات"
+        />
 
-        <Separator />
+        <NavItem
+          pathname={pathname}
+          collapsed={collapsed}
+          href="/storage"
+          Icon={<GrStorage />}
+          name="المخزن"
+        />
 
-        <Button
-          className=" w-full rounded-[0px]"
-          variant={pathname === "/storage" ? "default" : "link"}
-        >
-          <Link className="flex-between sm:gap-2" href={"/storage"}>
-            <GrStorage />
-            {!collapsed && <span className="">المخزن</span>}
-          </Link>
-        </Button>
+        <NavItem
+          pathname={pathname}
+          collapsed={collapsed}
+          href="/orders"
+          Icon={<IoNewspaperOutline />}
+          name="الطلبات"
+        />
 
-        <Separator />
+        <NavItem
+          pathname={pathname}
+          collapsed={collapsed}
+          href="/cities"
+          Icon={<FaMapMarked />}
+          name="المدن"
+        />
+        <NavItem
+          pathname={pathname}
+          collapsed={collapsed}
+          href="/employee"
+          Icon={<CiUser />}
+          name="الموظفين"
+        />
       </Menu>
     </Sidebar>
   );

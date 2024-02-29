@@ -7,6 +7,8 @@ import Header from "./components/header";
 import { Separator } from "@/components/ui/separator";
 import Breadcrumbs from "./components/bread-crumbs";
 import { Cairo } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
+
 const cairo = Cairo({
   weight: ["400", "700"],
   style: ["normal"],
@@ -28,7 +30,7 @@ export default function RootLayout({
     <html lang="ar" suppressHydrationWarning>
       <body className={cairo.className}>
         <Providers>
-          <AppRouterCacheProvider  options={{ enableCssLayer: true }}>
+          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
             <div className=" flex justify-start">
               <main className=" flex-1">
                 <Header />
@@ -38,6 +40,7 @@ export default function RootLayout({
               </main>
               <SideBar />
             </div>
+            <Toaster />
           </AppRouterCacheProvider>
         </Providers>
       </body>

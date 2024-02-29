@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -50,7 +49,6 @@
   }
 }
 
-
 @layer base {
   * {
     @apply border-border;
@@ -61,11 +59,22 @@
 }
 
 .flex-between {
-  @apply flex justify-between items-center
+  @apply flex justify-between items-center;
 }
 .flex-center {
-  @apply flex justify-center items-center
+  @apply flex justify-center items-center;
 }
 .flex-center-col {
-  @apply flex flex-col  justify-center items-center
+  @apply flex flex-col  justify-center items-center;
+}
+.spin-animation {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
