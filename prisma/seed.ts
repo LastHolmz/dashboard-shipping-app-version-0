@@ -42,7 +42,10 @@ export const findProductById = forceStore(
     try {
       const product = await prisma.product.findUnique({
         where: { id },
-        include: { sku: true, sizes: true },
+        select: {
+          name: true,
+          sku: true,
+        },
       });
       return product;
     } catch (error) {
@@ -90,6 +93,9 @@ export const findStoressByName = async (name?: string) => {
         },
       },
     });
+    if (!stores) {
+      return [];
+    }
     return stores;
   } catch (error) {
     console.error("Error finding products:", error);

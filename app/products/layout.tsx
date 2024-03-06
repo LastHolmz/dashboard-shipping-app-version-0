@@ -19,7 +19,6 @@ export default function StorageLayout({
         <TabItem href="products/stores" content="المتاجر" />
         <TabItem href="products/verify-product" content="توثيق منتج" />
         <TabItem href="products/verify-store" content="توثيق متجر" />
-        <TabItem href="products/invoiceses" content="الفواتير" />
       </Tab>
       <Separator />
       {children}

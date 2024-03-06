@@ -1,4 +1,4 @@
-import NavBox from "./components/nav-box";
+import CardBox from "../components/card-box";
 
 const page = async () => {
   // const data = await fetch("http://localhost:10000/users")
@@ -7,15 +7,15 @@ const page = async () => {
   return (
     <section dir="rtl">
       <div className="flex justify-start items-start gap-2 my-2 p-2 w-[95%]">
-        <NavBox
+        <CardBox
           link="products/verify-product"
           info={`توثيق و إضافة المنتجات`}
-          className=" transition-all md:basis-1/2 hover:scale-[1.1] hover:m-1 lg:basis-1/4"
+          content="توثيق اي منتج او  اضافة منتج جديد و تعديل اي كمية  من منتج معين"
         />
-        <NavBox
+        <CardBox
           link="products/verify-store"
           info={`توثيق متجر`}
-          className=" transition-all md:basis-1/2 hover:scale-[1.1] hover:m-1 lg:basis-1/4"
+          content="إمكانية توثيق اي متجر و تعطيل و تشغيل متجر ما"
         />
       </div>
       <div></div>

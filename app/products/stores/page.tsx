@@ -22,19 +22,23 @@ const page = async ({
         dir="rtl"
         lang="ar"
       >
-        {stores?.map((store, index) => {
-          return (
-            <Fragment key={index}>
-              <Store
-                id={store.id}
-                verified={store.verified}
-                img={store?.logo || null}
-                name={store.name}
-              />
-              <Separator className="my-1" />
-            </Fragment>
-          );
-        })}
+        {stores ? (
+          stores?.map((store, index) => {
+            return (
+              <Fragment key={index}>
+                <Store
+                  id={store.id}
+                  verified={store.verified}
+                  img={store?.logo || null}
+                  name={store.name}
+                />
+                <Separator className="my-1" />
+              </Fragment>
+            );
+          })
+        ) : (
+          <div>لا يوجد متاجر</div>
+        )}
       </ScrollArea>
     </section>
   );
