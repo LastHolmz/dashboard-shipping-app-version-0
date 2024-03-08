@@ -15,7 +15,35 @@ import {
 } from "next/cache";
 import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
-
+export const findPrdocuts = async () => {
+  try {
+    const products = await prisma.product.findMany({
+      where: {},
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        barcode: true,
+        sku: {
+          select: { qty: true },
+        },
+        store: {
+          select: {
+            name: true,
+          },
+        },
+        accepted: true,
+      },
+    });
+    if (!products || products.length === 0) {
+      return [];
+    }
+    return products;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};
 export const findProductsByName = async (name?: string) => {
   noStore();
   try {

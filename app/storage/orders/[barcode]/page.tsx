@@ -31,13 +31,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function page({ params }: Props) {
   const barcode = params.barcode;
-  console.log(barcode);
   const order = await findOrderByBarcode(barcode);
   if (order === undefined) {
     return notFound();
   }
-  console.log(order);
-  //   const isVerified = await isStoreVerified(barcode);
   const data = order.orderItems.map((orderItem) => {
     return {
       id: orderItem.id,
