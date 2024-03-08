@@ -9,7 +9,13 @@ import {
 import { Pencil1Icon } from "@radix-ui/react-icons";
 import { UpdateSkuQtyForm } from "./forms";
 
-export default function SkuDialog({ id }: { id: string }) {
+export default function SkuDialog({
+  id,
+  maxNumber,
+}: {
+  id: string;
+  maxNumber: number;
+}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -22,7 +28,7 @@ export default function SkuDialog({ id }: { id: string }) {
           <DialogTitle>تعديل الكمية</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <UpdateSkuQtyForm id={id} />
+          <UpdateSkuQtyForm id={id} maxNumber={maxNumber} />
         </div>
       </DialogContent>
     </Dialog>

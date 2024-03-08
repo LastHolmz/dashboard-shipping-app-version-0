@@ -8,6 +8,7 @@ import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Fragment } from "react";
 import { Separator } from "@/components/ui/separator";
+import { OrderItem, OrderItemsTabel } from "./tabel";
 
 type Props = {
   params: { barcode: string };
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   // optionally access and extend (rather than replace) parent metadata
   return {
-    title: `${order.barcode} |  فحص  الفاتورة`,
+    title: `${order.order.barcode} |  فحص  الفاتورة`,
   };
 }
 
@@ -37,10 +38,27 @@ export default async function page({ params }: Props) {
   }
   console.log(order);
   //   const isVerified = await isStoreVerified(barcode);
+  const data = order.orderItems.map((orderItem) => {
+    return {
+      id: orderItem.id,
+      price: orderItem.price,
+      qty: orderItem.qty,
+      barcode: orderItem.Sku?.product?.barcode || "1111111",
+      color: orderItem?.Sku?.name || "white",
+      colorName: orderItem?.Sku?.color || "#fff",
+    };
+  });
   return (
     <section dir="rtl">
-      <h1 className="font-bold text-xl m-2">رقم الفاتورة {order.barcode} </h1>
-      {order.OrderItems[0].skuId}
+      <h1 className="font-bold text-xl m-2">
+        رقم الفاتورة {order.order.barcode}{" "}
+      </h1>
+      {/* {order.orderItems?.map((orderItem, index) => { */}
+      <OrderItemsTabel data={data as unknown as OrderItem[]} />;
+      {/* // <div key={index}>
+        //   {orderItem.Sku?.product?.barcode} / {orderItem.qty} /{" "}
+        //   {orderItem.price} / {orderItem.Sku?.name}
+        // </div> */}
     </section>
   );
 }

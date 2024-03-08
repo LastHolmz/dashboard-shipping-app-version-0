@@ -30,7 +30,7 @@ const Sku: React.FC<Props> = async ({ id, state, qty, color, colorName }) => {
           />
           <div className="flex justify-center items-center gap-1">
             {state === "Pending" ? <VerifySkuForm id={id} /> : <></>}
-            <SkuDialog id={id} />
+            <SkuDialog maxNumber={qty} id={id} />
           </div>
         </CardTitle>
         <CardDescription>{colorName}</CardDescription>

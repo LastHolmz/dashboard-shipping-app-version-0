@@ -41,7 +41,13 @@ function SubmitButton({
   );
 }
 
-export function UpdateSkuQtyForm({ id }: { id: string }) {
+export function UpdateSkuQtyForm({
+  id,
+  maxNumber,
+}: {
+  id: string;
+  maxNumber: number;
+}) {
   const { toast } = useToast();
   const [state, formAction] = useFormState(updateSkuQtyAction, initialState);
   useEffect(() => {
@@ -57,7 +63,13 @@ export function UpdateSkuQtyForm({ id }: { id: string }) {
     <form action={formAction}>
       <Input type={"hidden"} id="todo" name="id" value={id} />
       <Label htmlFor="qty">الكمية</Label>
-      <Input type={"number"} id="qty" name="qty" value={id} />
+      <Input
+        type={"number"}
+        id="qty"
+        name="qty"
+        min={0}
+        defaultValue={maxNumber || 0}
+      />
       <SubmitButton
         Icon="حفظ"
         className="w-full mt-1"

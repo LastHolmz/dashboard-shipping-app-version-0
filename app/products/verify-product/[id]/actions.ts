@@ -8,22 +8,21 @@ export async function verifySkuAction(
   },
   formData: FormData
 ) {
-  const schema = z.object({
-    id: z.string(),
-  });
-  const parse = schema.safeParse({
-    id: formData.get("id"),
-  });
-
-  if (!parse.success) {
-    return { message: "لا يوجد id" };
-  }
-
-  const data = parse.data;
-
   try {
+    const schema = z.object({
+      id: z.string(),
+    });
+    const parse = schema.safeParse({
+      id: formData.get("id"),
+    });
+
+    if (!parse.success) {
+      return { message: "لا يوجد id" };
+    }
+
+    const data = parse.data;
+
     const res = await verifySku(parse.data.id);
-    revalidatePath("/");
     return { message: `${res.message}` };
   } catch (e) {
     return { message: "فشل التحديث" };
@@ -35,26 +34,27 @@ export async function updateSkuQtyAction(
   },
   formData: FormData
 ) {
-  const schema = z.object({
-    id: z.string(),
-    qty: z.string().min(0, {
-      message: "يجب ان تكون الكمية اكبر من 0",
-    }),
-  });
-
-  const parse = schema.safeParse({
-    id: formData.get("id"),
-    qty: formData.get("qty"),
-  });
-
-  if (!parse.success) {
-    return { message: "يجب ان تكون الكمية اكبر من 0" };
-  }
-
-  const data = parse.data;
   try {
+    const schema = z.object({
+      id: z.string(),
+      qty: z.string().min(0, {
+        message: "يجب ان تكون الكمية اكبر من 0",
+      }),
+    });
+
+    const parse = schema.safeParse({
+      id: formData.get("id"),
+      qty: formData.get("qty"),
+    });
+
+    if (!parse.success) {
+      return { message: "يجب ان تكون الكمية اكبر من 0" };
+    }
+
+    const data = parse.data;
+
     const res = await updateSku(data.id, Number(data.qty));
-    revalidatePath("/");
+
     return { message: `${res.message}` };
   } catch (e) {
     return { message: "فشل التحديث" };

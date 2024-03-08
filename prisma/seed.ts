@@ -37,25 +37,21 @@ export const findProductsByName = async (name?: string) => {
     return undefined;
   }
 };
-export const findProductById = forceStore(
-  async (id: string) => {
-    try {
-      const product = await prisma.product.findUnique({
-        where: { id },
-        select: {
-          name: true,
-          sku: true,
-        },
-      });
-      return product;
-    } catch (error) {
-      console.error("Error finding products:", error);
-      return undefined;
-    }
-  },
-  ["products"],
-  { tags: ["products"], revalidate: 10840 }
-);
+export const findProductById = async (id: string) => {
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id },
+      select: {
+        name: true,
+        sku: true,
+      },
+    });
+    return product;
+  } catch (error) {
+    console.error("Error finding products:", error);
+    return undefined;
+  }
+};
 export const verifySku = async (skuId: string) => {
   try {
     await prisma.sku.update({
@@ -77,8 +73,10 @@ export const updateSku = async (skuId: string, qty: number) => {
         qty: qty,
       },
     });
+    revalidatePath("/");
     return { message: "تم التحديث" };
   } catch (error) {
+    console.log(error);
     return { message: "فشل التحديث" };
   }
 };
@@ -355,26 +353,39 @@ export const findOrderByBarcode = async (barcode: string) => {
   try {
     const order = await prisma.order.findUnique({
       where: { barcode },
-      include: {
-        OrderItems: {
+      select: {
+        barcode: true,
+        id: true,
+      },
+    });
+
+    if (!order) {
+      return undefined;
+    }
+    const orderItems = await prisma.orderItem.findMany({
+      where: { orderId: order.id },
+      select: {
+        id: true,
+        price: true,
+        qty: true,
+        Sku: {
           select: {
-            skuId: true,
-            price: true,
-          },
-        },
-        Cities: {
-          select: {
+            color: true,
             name: true,
-            gender: true,
-            price: true,
+            product: {
+              select: {
+                barcode: true,
+              },
+            },
           },
         },
       },
     });
-    if (!order) {
+    if (!orderItems) {
       return undefined;
     }
-    return order;
+    const data = { order, orderItems };
+    return data;
   } catch (error) {
     console.log(error);
     return undefined;

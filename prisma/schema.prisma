@@ -51,6 +51,7 @@ model Order {
 model OrderItem {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
   productId String  @db.ObjectId
+  Sku       Sku?    @relation(fields: [skuId], references: [id])
   skuId     String  @db.ObjectId
   qty       Int
   price     Int
@@ -168,6 +169,7 @@ model Sku {
   sizeId    String?      @db.ObjectId
   qty       Int          @default(0)
   name      String?      @default("تلقائي")
+  OrderItem OrderItem[]
 }
 
 model Comment {
