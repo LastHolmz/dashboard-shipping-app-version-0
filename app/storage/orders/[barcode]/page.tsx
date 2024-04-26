@@ -40,9 +40,9 @@ export default async function page({ params }: Props) {
       id: orderItem.id,
       price: orderItem.price,
       qty: orderItem.qty,
-      barcode: orderItem.Sku?.product?.barcode || "1111111",
-      color: orderItem?.Sku?.name || "white",
-      colorName: orderItem?.Sku?.color || "#fff",
+      barcode: orderItem.Sku?.Size?.Product?.barcode || "1111111",
+      color: orderItem?.Sku?.nameOfColor || "white",
+      colorName: orderItem?.Sku?.nameOfColor || "#fff",
     };
   });
   return (

@@ -29,9 +29,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import type { User } from "../types";
 import Filter from "./filter";
 import { columns } from "./tabel-column";
+import { User } from "@prisma/client";
 
 export default function UsersTable({ data }: { data: User[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);

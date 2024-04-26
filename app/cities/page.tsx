@@ -8,7 +8,7 @@ const page = async () => {
     <main dir={"rtl"}>
       <CreateDialog />
       <Separator className="my-2" />
-      <CityTabel cities={cities} />
+      {cities && <CityTabel cities={cities} />}
     </main>
   );
 };

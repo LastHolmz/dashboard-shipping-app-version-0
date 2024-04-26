@@ -50,13 +50,14 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  productId String  @db.ObjectId
-  skuId     String  @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId String   @db.ObjectId
+  skuId     String[] @db.ObjectId
+  Sku       Sku      @relation(fields: [skuId], references: [id])
   qty       Int
   price     Int
-  Order     Order?  @relation(fields: [orderId], references: [id])
-  orderId   String? @db.ObjectId
+  Order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?  @db.ObjectId
 }
 
 model UserInfo {
@@ -207,6 +208,7 @@ model Sku {
   qty         Int          @default(0)
   newQty      Int          @default(0)
   nameOfColor String       @default("تلقائي")
+  OrderItems  OrderItem[]
 }
 
 model Comment {

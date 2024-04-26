@@ -1,4 +1,3 @@
-import { User } from "../types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -13,7 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+export interface User {
+  firstName: string;
+  lastName: string;
+  userName: string;
+  phoneNumber: number;
+  verified: boolean;
+}
 export const columns: ColumnDef<User>[] = [
   {
     id: "select",
@@ -23,14 +28,14 @@ export const columns: ColumnDef<User>[] = [
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!value)}
         aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onCheckedChange={(value) => row.toggleSelected(!value)}
         aria-label="Select row"
       />
     ),

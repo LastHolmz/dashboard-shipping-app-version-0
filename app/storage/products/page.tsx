@@ -11,10 +11,14 @@ const productsPage = async () => {
   const products = await findPrdocuts();
   if (!products) return undefined;
   const data = products.map((product) => {
+    let num: number = 0;
+    product.sizes.map(
+      (size) => (num += size.sku.reduce((acc, current) => acc + current.qty, 0))
+    );
     return {
       id: product.id,
       name: product.name,
-      qty: product.sku.reduce((acc, current) => acc + current.qty, 0),
+      qty: num,
       barcode: product.barcode,
       storeName: cutString(product.store?.name || "غير موجود", 20),
       price: product.price,

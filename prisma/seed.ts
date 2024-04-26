@@ -14,7 +14,7 @@ import {
   revalidatePath,
 } from "next/cache";
 import bcrypt from "bcrypt";
-export const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 //
 export const findPrdocuts = async () => {
   try {
@@ -25,6 +25,11 @@ export const findPrdocuts = async () => {
         name: true,
         price: true,
         barcode: true,
+        sizes: {
+          include: {
+            sku: true,
+          },
+        },
         /*  sku: {
           select: { qty: true },
         }, */
@@ -409,17 +414,27 @@ export const findOrderByBarcode = async (barcode: string) => {
         id: true,
         price: true,
         qty: true,
-        /*  Sku: {
+
+        Sku: {
           select: {
             color: true,
-            name: true,
-            product: {
+            nameOfColor: true,
+            Size: {
+              include: {
+                Product: {
+                  select: {
+                    barcode: true,
+                  },
+                },
+              },
+            },
+            /* product: {
               select: {
                 barcode: true,
               },
-            },
+            }, */
           },
-       },  */
+        },
       },
     });
     if (!orderItems) {
