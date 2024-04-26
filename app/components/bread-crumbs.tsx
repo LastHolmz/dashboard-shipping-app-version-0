@@ -24,6 +24,10 @@ const Indicator: React.FC = () => {
     services: "الخدمات",
     about: "عنا",
     storage: "المخزن",
+    employee: "الموظفين",
+    cities: "المدن",
+    orders: "الطلبات",
+
     // Add more static segments here if needed
   };
 
@@ -36,11 +40,8 @@ const Indicator: React.FC = () => {
           </li>
         ) : (
           <li>
-            <Link
-              href="/"
-              className="text-primary"
-            >
-              لوحة التحكم  |  تلقائي
+            <Link href="/" className="text-primary">
+              لوحة التحكم | تلقائي
             </Link>
           </li>
         )}

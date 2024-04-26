@@ -1,6 +1,11 @@
 import { findPrdocuts } from "@/prisma/seed";
 import { cutString } from "@/lib/cut";
 import { ProductTabel } from "./tabel";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "storage | products",
+};
 
 const productsPage = async () => {
   const products = await findPrdocuts();

@@ -18,18 +18,23 @@ interface Props {
   colorName: string;
 }
 const Sku: React.FC<Props> = async ({ id, state, qty, color, colorName }) => {
+  const roleMap = new Map<string, string>([
+    ["Pending", "bg-orange-600"],
+    ["Sent", "bg-blue-600"],
+    ["Working", "bg-green-600"],
+  ]);
+
+  function colorToRole(): string {
+    return roleMap.get(state) || "";
+  }
+
   return (
     <Card className="hover:bg-secondary">
       <CardHeader>
         <CardTitle className=" flex items-center justify-between w-full">
-          <div
-            className={cn(
-              "rounded-full w-6 h-6",
-              state === "Pending" ? "bg-orange-600" : "bg-green-600"
-            )}
-          />
+          <div className={cn("rounded-full w-6 h-6", colorToRole())} />
           <div className="flex justify-center items-center gap-1">
-            {state === "Pending" ? <VerifySkuForm id={id} /> : <></>}
+            {state !== "Working" ? <VerifySkuForm id={id} qty={qty} /> : <></>}
             <SkuDialog maxNumber={qty} id={id} />
           </div>
         </CardTitle>

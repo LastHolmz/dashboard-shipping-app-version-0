@@ -14,7 +14,8 @@ import {
   revalidatePath,
 } from "next/cache";
 import bcrypt from "bcrypt";
-const prisma = new PrismaClient();
+export const prisma = new PrismaClient();
+//
 export const findPrdocuts = async () => {
   try {
     const products = await prisma.product.findMany({
@@ -24,9 +25,9 @@ export const findPrdocuts = async () => {
         name: true,
         price: true,
         barcode: true,
-        sku: {
+        /*  sku: {
           select: { qty: true },
-        },
+        }, */
         store: {
           select: {
             name: true,
@@ -44,6 +45,7 @@ export const findPrdocuts = async () => {
     return [];
   }
 };
+
 export const findProductsByName = async (name?: string) => {
   noStore();
   try {
@@ -55,7 +57,7 @@ export const findProductsByName = async (name?: string) => {
         accepted: false,
       },
       include: {
-        sku: true,
+        /*         sku: true, */
       },
     });
 
@@ -71,7 +73,12 @@ export const findProductById = async (id: string) => {
       where: { id },
       select: {
         name: true,
-        sku: true,
+        sizes: {
+          include: {
+            sku: true,
+          },
+        },
+        /*  sku: true, */
       },
     });
     return product;
@@ -80,12 +87,18 @@ export const findProductById = async (id: string) => {
     return undefined;
   }
 };
-export const verifySku = async (skuId: string) => {
+export const verifySku = async (skuId: string, qty: string) => {
   try {
     await prisma.sku.update({
       where: { id: skuId },
       data: {
         verified: "Working",
+        newQty: {
+          decrement: Number(qty),
+        },
+        qty: {
+          increment: Number(qty),
+        },
       },
     });
     return { message: "تم التحديث" };
@@ -396,7 +409,7 @@ export const findOrderByBarcode = async (barcode: string) => {
         id: true,
         price: true,
         qty: true,
-        Sku: {
+        /*  Sku: {
           select: {
             color: true,
             name: true,
@@ -406,7 +419,7 @@ export const findOrderByBarcode = async (barcode: string) => {
               },
             },
           },
-        },
+       },  */
       },
     });
     if (!orderItems) {
@@ -619,3 +632,127 @@ async function comparePassword(
   const passwordMatch = await bcrypt.compare(password, hashedPassword);
   return passwordMatch;
 }
+/**
+   async funciton that either [] or Category[] returns the main categories
+   @example
+
+// Get main Categories
+const categories = await getCategories();
+   @type {id: string;name: string;img: string | null;productIds: string[];main: boolean | null;}
+
+ */
+export const getCategories = async () => {
+  noStore();
+  try {
+    const categories = await prisma.category.findMany({});
+    if (!categories) {
+      return [];
+    }
+    return categories;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};
+export const newCategory = async ({
+  name,
+  img,
+  main,
+}: {
+  name: string;
+  img?: string;
+  main: boolean;
+}): Promise<{ message: string }> => {
+  try {
+    const category = await prisma.category.create({
+      data: {
+        name,
+        img,
+        main,
+      },
+    });
+    if (!category) {
+      return { message: "فشلت العملية" };
+    }
+    revalidatePath("/");
+    return { message: "تم إنشاء الصنف بنجاح" };
+  } catch (error) {
+    console.log(error);
+    return { message: "فشلت العملية" };
+  }
+};
+export const editCategory = async ({
+  name,
+  img,
+  main,
+  id,
+}: {
+  name: string;
+  img?: string;
+  main: boolean;
+  id: string;
+}): Promise<{ message: string }> => {
+  noStore();
+  try {
+    const category = await prisma.category.update({
+      where: { id: id },
+      data: {
+        name,
+        img,
+      },
+    });
+    if (!category) {
+      return { message: "فشلت العملية" };
+    }
+    revalidatePath("/");
+    return { message: "تم تعديل الصنف بنجاح" };
+  } catch (error) {
+    console.log(error);
+    return { message: "فشلت العملية" };
+  }
+};
+export const deletCategory = async ({
+  id,
+}: {
+  id: string;
+}): Promise<{ message: string }> => {
+  try {
+    const category = await prisma.category.findUnique({ where: { id } });
+    if (!category) {
+      return { message: "category no more available" };
+    }
+    const deletCategory = await prisma.category.update({
+      where: { id },
+      data: {
+        products: {
+          disconnect: category.productIds.map((id) => ({ id: id })),
+        },
+      },
+    });
+    const deleted = await prisma.category.delete({ where: { id } });
+    if (!deletCategory || !deleted) {
+      return { message: "فشلت العملية" };
+    }
+
+    revalidatePath("/");
+    return { message: "تم حذف الصنف بنجاح" };
+  } catch (error) {
+    console.log(error);
+    return { message: "فشلت العملية" };
+  }
+};
+
+export const getAssembleRequests = async () => {
+  try {
+    const requests = await prisma.assembleRequest.findMany({
+      include: { assemble: true },
+    });
+    if (!requests) {
+      return [];
+    }
+    return requests;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};

@@ -27,7 +27,8 @@ model User {
   messagesSent      Message[]     @relation("SentMessage")
   messagesReceived  Message[]     @relation("ReceivedMessage")
   hashedPassword    String
-  productLike       ProductLike[]
+  productLike       ProductLike[] @relation(fields: [productIds], references: [id])
+  productIds        String[]      @db.ObjectId
   store             Store?
   Order             Order[]
 }
@@ -51,7 +52,6 @@ model Order {
 model OrderItem {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
   productId String  @db.ObjectId
-  Sku       Sku?    @relation(fields: [skuId], references: [id])
   skuId     String  @db.ObjectId
   qty       Int
   price     Int
@@ -68,17 +68,19 @@ model UserInfo {
   user              User?     @relation(fields: [userId], references: [id])
   userId            String?   @unique @db.ObjectId
   locationId        String?   @unique @db.ObjectId
+  gender            Gender    @default(Man)
 }
 
 model Location {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  city     String?
-  region   String?
-  street   String?
-  info     String?
-  userInfo UserInfo?
-  Order    Order?    @relation(fields: [orderId], references: [id])
-  orderId  String?   @unique @db.ObjectId
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  city           String?
+  region         String?
+  street         String?
+  info           String?
+  googleLocation String?
+  userInfo       UserInfo?
+  Order          Order?    @relation(fields: [orderId], references: [id])
+  orderId        String?   @unique @db.ObjectId
 }
 
 model Store {
@@ -93,38 +95,68 @@ model Store {
   followedBy      User[]    @relation("FollowedBy", fields: [followedByIDs], references: [id])
   followedByIDs   String[]  @db.ObjectId
   products        Product[]
-  comment         Comment[]
-  Rate            Rate[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  owener          User?     @relation(fields: [owenerId], references: [id])
-  owenerId        String    @unique @db.ObjectId
-  verified        Boolean   @default(false)
+
+  // comment         Comment[]
+  // Rate            Rate[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owener    User?    @relation(fields: [owenerId], references: [id])
+  owenerId  String   @unique @db.ObjectId
+  verified  Boolean  @default(false)
+  freeShip  Boolean  @default(true)
 }
 
 model Product {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  store         Store?        @relation(fields: [storeId], references: [id])
-  storeId       String?       @db.ObjectId
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  store         Store?       @relation(fields: [storeId], references: [id])
+  storeId       String?      @db.ObjectId
   name          String
   description   String?
   originalPrice Int?
   price         Int
-  img           String
-  views         Int           @default(0)
-  sku           Sku[]
-  categories    Category[]
-  discount      Discount?     @relation(fields: [discountId], references: [id])
-  discountId    String?       @unique @db.ObjectId
+  // alot of images;
+  imgs          String[]
+  views         Int          @default(0)
+  // needs to be removed of dashboard;
+  // sku           Sku[]
+  categories    Category[]   @relation(fields: [categoryIds], references: [id])
+  categoryIds   String[]     @db.ObjectId
+  // discount      Discount?     @relation(fields: [discountId], references: [id])
+  // discountId    String?       @unique @db.ObjectId
   likes         Like[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  ProductLike   ProductLike[]
-  accepted      Boolean       @default(false)
-  barcode       String        @unique
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  accepted      Boolean      @default(false)
+  barcode       String       @unique
   sizes         Size[]
+  videos        String[]
+  // Discount      Discount[]
+  rates         Rate[]
+  ProductLike   ProductLike?
+  verified      Boolean      @default(false)
 }
 
+model AssembleRequest {
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  assemble  AssembleProduct[]
+  status    AssembleStatus    @default(Pending)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+model AssembleProduct {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  productName String
+  img         String
+  nameOfColor String
+  skuId       String
+  barcode     String
+  qty         Int
+  Request     AssembleRequest? @relation(fields: [requestId], references: [id])
+  requestId   String?          @db.ObjectId
+}
+
+//  each size has colors and qtys;
 model Size {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   Product   Product? @relation(fields: [productId], references: [id])
@@ -133,72 +165,75 @@ model Size {
   name      String
 }
 
+// product like lists
 model ProductLike {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   product   Product? @relation(fields: [productId], references: [id])
-  productId String?  @db.ObjectId
-  user      User?    @relation(fields: [userId], references: [id])
-  userId    String?  @db.ObjectId
+  productId String?  @unique @db.ObjectId
+  user      User[]   @relation(fields: [userIds], references: [id])
+  userIds   String[] @db.ObjectId
 }
 
-model Discount {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  value      Int
-  ratio      Int
-  expiration DateTime
-  Product    Product?
-}
+// future discount
+// model Discount {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   value      Int
+//   ratio      Int
+//   expiration DateTime
+//   Product    Product? @relation(fields: [productId], references: [id])
+//   productId  String?  @db.ObjectId
+// }
 
+//
 model Category {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  img       String?
-  product   Product? @relation(fields: [productId], references: [id])
-  productId String?  @db.ObjectId
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  img        String?
+  products   Product[] @relation(fields: [productIds], references: [id])
+  productIds String[]  @db.ObjectId
+  // if main category or not
+  userId     String?
+  // userId     String    @db.ObjectId
+  main       Boolean?  @default(false)
 }
 
 model Sku {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  img       String?
-  video     String?
-  color     String
-  product   Product?     @relation(fields: [productId], references: [id])
-  productId String?      @db.ObjectId
-  verified  ProductState @default(Pending)
-  Size      Size?        @relation(fields: [sizeId], references: [id])
-  sizeId    String?      @db.ObjectId
-  qty       Int          @default(0)
-  name      String?      @default("تلقائي")
-  OrderItem OrderItem[]
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  // verified by admins
+  verified    ProductState @default(Pending)
+  color       String
+  Size        Size?        @relation(fields: [sizeId], references: [id])
+  sizeId      String?      @db.ObjectId
+  qty         Int          @default(0)
+  newQty      Int          @default(0)
+  nameOfColor String       @default("تلقائي")
 }
 
 model Comment {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  contern   String
-  store     Store?   @relation(fields: [storeId], references: [id])
-  storeId   String?  @db.ObjectId
-  user      User?    @relation(fields: [storeId], references: [id])
+  content   String
+  user      User?    @relation(fields: [userId], references: [id])
   userId    String?  @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Rate {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  store   Store?  @relation(fields: [storeId], references: [id])
-  storeId String? @db.ObjectId
-  user    User?   @relation(fields: [storeId], references: [id])
-  userId  String? @db.ObjectId
-  stars   Stars
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?  @db.ObjectId
+  stars     Int      @default(0)
 }
 
 model Ads {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  imgs      String[]
-  store     Store?   @relation(fields: [storeId], references: [id])
-  storeId   String?  @unique @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  imgs    String[]
+  store   Store?   @relation(fields: [storeId], references: [id])
+  storeId String?  @unique @db.ObjectId
+  // createdAt DateTime @default(now())
+  // updatedAt DateTime @updatedAt
 }
 
 model Like {
@@ -299,15 +334,13 @@ enum Role {
   Delivery
 }
 
-enum Stars {
-  Five
-  Four
-  Three
-  Two
-  One
-}
-
 enum ProductState {
   Pending
+  Sent
   Working
+}
+
+enum AssembleStatus {
+  Pending
+  Done
 }

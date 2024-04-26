@@ -4,7 +4,11 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function Tabs({ children }: { children: React.ReactNode }) {
-  return <nav className="hidden md:flex items-center" dir="rtl">{children}</nav>;
+  return (
+    <nav className="hidden md:flex items-center" dir="rtl">
+      {children}
+    </nav>
+  );
 }
 interface LinkProps {
   href: string;
@@ -12,12 +16,15 @@ interface LinkProps {
 }
 export function TabItem({ href, content }: LinkProps) {
   const pathname = usePathname();
+  if (pathname === `/${href}` || pathname.startsWith(`${href}/`)) {
+    console.log(pathname);
+  }
   return (
     <div className=" relative w-fit">
       <Link
         className={cn(
           "flex-center h-12 px-4",
-          pathname === `/${href}`
+          pathname === `/${href}` || pathname.startsWith(`${href}/`)
             ? "text-rose-900 dark:text-rose-600"
             : "dark:text-white text-black"
         )}

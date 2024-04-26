@@ -79,7 +79,7 @@ export function UpdateSkuQtyForm({
     </form>
   );
 }
-export function VerifySkuForm({ id }: { id: string }) {
+export function VerifySkuForm({ id, qty }: { id: string; qty: number }) {
   const { toast } = useToast();
   const [state, formAction] = useFormState(verifySkuAction, initialState);
   useEffect(() => {
@@ -94,6 +94,8 @@ export function VerifySkuForm({ id }: { id: string }) {
   return (
     <form action={formAction}>
       <Input type={"hidden"} id="todo" name="id" value={id} />
+      <Input type={"hidden"} name="qty" value={qty} />
+
       <SubmitButton Icon={<MdOutlineVerified />} icon={true} />
     </form>
   );

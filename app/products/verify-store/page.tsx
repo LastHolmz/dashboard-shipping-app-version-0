@@ -28,7 +28,7 @@ const page = async ({
               <Store
                 id={store.id}
                 verified={store.verified}
-                img={store?.logo || null}
+                img={store.logo as string}
                 name={store.name}
               />
               <Separator className="my-1" />

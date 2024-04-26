@@ -28,7 +28,7 @@ const page = async ({
             <Fragment key={index}>
               <Product
                 id={product.id}
-                img={product.img}
+                img={product.imgs[0]! as string}
                 name={product.name}
                 description={product.description || ""}
               />

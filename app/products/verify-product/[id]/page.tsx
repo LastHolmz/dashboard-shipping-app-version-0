@@ -37,17 +37,19 @@ export default async function Page({ params }: Props) {
     <section dir="rtl">
       <h1>{product.name}</h1>
       <div className="grid gap-2 my-2 md:grid-cols-2 lg:grid-cols-4">
-        {product.sku.map((sku, index) => {
-          return (
-            <Sku
-              state={sku.verified}
-              colorName={sku.name || "#000"}
-              qty={sku.qty}
-              color={sku.color}
-              key={index}
-              id={sku.id}
-            />
-          );
+        {product.sizes.map((size, index) => {
+          return size.sku.map((sku, index) => {
+            return (
+              <Sku
+                state={sku.verified}
+                colorName={sku.nameOfColor || "#000"}
+                qty={sku.newQty}
+                color={sku.color}
+                key={index}
+                id={sku.id}
+              />
+            );
+          });
         })}
       </div>
     </section>

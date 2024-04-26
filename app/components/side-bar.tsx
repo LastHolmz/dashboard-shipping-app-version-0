@@ -13,6 +13,7 @@ import { IoNewspaperOutline } from "react-icons/io5";
 import { btnVariants } from "./variants";
 import { FaCartFlatbed } from "react-icons/fa6";
 import { CiUser } from "react-icons/ci";
+import { FaFileAlt } from "react-icons/fa";
 
 const NavItem = ({
   pathname,
@@ -125,6 +126,20 @@ const SideBar = () => {
           href="/employee"
           Icon={<CiUser />}
           name="الموظفين"
+        />
+        <NavItem
+          pathname={pathname}
+          collapsed={collapsed}
+          href="/users"
+          Icon={<CiUser />}
+          name="المستخدمين"
+        />
+        <NavItem
+          pathname={pathname}
+          collapsed={collapsed}
+          href="/requests"
+          Icon={<FaFileAlt />}
+          name="الطلبات"
         />
       </Menu>
     </Sidebar>

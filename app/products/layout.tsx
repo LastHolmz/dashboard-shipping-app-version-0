@@ -16,6 +16,8 @@ export default function StorageLayout({
     <main className="px-2 h-screen">
       <Tab>
         <TabItem href="products" content="تلقائي" />
+        <TabItem href="products/products" content="المنتجات" />
+        <TabItem href="products/categories" content="الأصناف" />
         <TabItem href="products/stores" content="المتاجر" />
         <TabItem href="products/verify-product" content="توثيق منتج" />
         <TabItem href="products/verify-store" content="توثيق متجر" />

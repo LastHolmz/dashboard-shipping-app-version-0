@@ -11,9 +11,11 @@ export async function verifySkuAction(
   try {
     const schema = z.object({
       id: z.string(),
+      qty: z.string(),
     });
     const parse = schema.safeParse({
       id: formData.get("id"),
+      qty: formData.get("qty"),
     });
 
     if (!parse.success) {
@@ -22,7 +24,7 @@ export async function verifySkuAction(
 
     const data = parse.data;
 
-    const res = await verifySku(parse.data.id);
+    const res = await verifySku(parse.data.id, parse.data.qty);
     return { message: `${res.message}` };
   } catch (e) {
     return { message: "فشل التحديث" };

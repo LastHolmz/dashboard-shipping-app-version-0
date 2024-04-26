@@ -7,7 +7,7 @@ import React, { Suspense } from "react";
 import { MdVerified } from "react-icons/md";
 
 interface Props {
-  img: string | null;
+  img: string;
   name: string;
   id: string;
   verified: boolean;
@@ -23,7 +23,7 @@ const Store: React.FC<Props> = async ({ img, name, id, verified }) => {
       <Suspense fallback={<Skeleton className="h-12 w-12 rounded-full" />}>
         <div className=" rounded-full overflow-hidden">
           <Image
-            src={"/imgs/unknow-store.png"}
+            src={img}
             width={1000}
             height={1000}
             alt={name}
