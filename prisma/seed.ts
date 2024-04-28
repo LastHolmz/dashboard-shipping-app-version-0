@@ -399,14 +399,12 @@ export const redirectOrder = async (
   }
 };
 export const findOrderByBarcode = async (barcode: string) => {
-  noStore();
   try {
     const order = await prisma.order.findUnique({
       where: { barcode },
       include: {
         Cities: true,
-        location: true,
-        OrderItems: {
+        orderItems: {
           include: {
             Sku: true,
           },

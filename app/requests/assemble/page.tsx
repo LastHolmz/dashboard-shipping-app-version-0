@@ -52,7 +52,7 @@ const AssembleRequestsPage = async () => {
           );
 
           return (
-            <Link href={`/requests/assemble/${request.id}`}>
+            <Link key={index} href={`/requests/assemble/${request.id}`}>
               <Card>
                 <CardHeader>
                   <div className="flex flex-col gap-2">

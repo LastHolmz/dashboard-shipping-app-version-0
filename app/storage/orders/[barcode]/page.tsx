@@ -36,8 +36,8 @@ export default async function page({ params }: Props) {
   if (order === undefined) {
     return notFound();
   }
-  revalidatePath("/");
-  const data = order.OrderItems.map((orderItem) => {
+  // revalidatePath("/");
+  const data = order.orderItems.map((orderItem) => {
     return {
       id: orderItem.id,
       price: orderItem.price,
