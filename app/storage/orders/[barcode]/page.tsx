@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Fragment } from "react";
 import { Separator } from "@/components/ui/separator";
 import { OrderItem, OrderItemsTabel } from "./tabel";
+import { revalidatePath } from "next/cache";
 
 type Props = {
   params: { barcode: string };
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   // optionally access and extend (rather than replace) parent metadata
   return {
-    title: `${order.order.barcode} |  فحص  الفاتورة`,
+    title: `${order.barcode} |  فحص  الفاتورة`,
   };
 }
 
@@ -35,27 +36,20 @@ export default async function page({ params }: Props) {
   if (order === undefined) {
     return notFound();
   }
-  const data = order.orderItems.map((orderItem) => {
+  revalidatePath("/");
+  const data = order.OrderItems.map((orderItem) => {
     return {
       id: orderItem.id,
       price: orderItem.price,
       qty: orderItem.qty,
-      barcode: orderItem.Sku?.Size?.Product?.barcode || "1111111",
-      color: orderItem?.Sku?.nameOfColor || "white",
-      colorName: orderItem?.Sku?.nameOfColor || "#fff",
+      barcode: orderItem.barcode,
+      colorName: orderItem.Sku.nameOfColor,
     };
   });
   return (
     <section dir="rtl">
-      <h1 className="font-bold text-xl m-2">
-        رقم الفاتورة {order.order.barcode}{" "}
-      </h1>
-      {/* {order.orderItems?.map((orderItem, index) => { */}
+      <h1 className="font-bold text-xl m-2">رقم الفاتورة {order.barcode} </h1>
       <OrderItemsTabel data={data as unknown as OrderItem[]} />;
-      {/* // <div key={index}>
-        //   {orderItem.Sku?.product?.barcode} / {orderItem.qty} /{" "}
-        //   {orderItem.price} / {orderItem.Sku?.name}
-        // </div> */}
     </section>
   );
 }

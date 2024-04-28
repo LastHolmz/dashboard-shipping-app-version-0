@@ -3,7 +3,7 @@ import Tab, { TabItem } from "../components/tabs";
 interface Props {
   children: React.ReactNode;
 }
-
+export const revalidate = 60;
 const usersLayout = ({ children }: Props) => {
   return (
     <main dir="rtl">

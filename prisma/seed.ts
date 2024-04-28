@@ -6,6 +6,9 @@ import {
   OrderState,
   Gender,
   EmployeeRole,
+  AssembleRequest,
+  AssembleProduct,
+  $Enums,
 } from "@prisma/client";
 import {
   unstable_noStore as noStore,
@@ -164,14 +167,14 @@ export const findStoreById = async (id: string) => {
                 info: true,
                 verfivicationImgs: true,
                 birthday: true,
-                location: {
+                /*  location: {
                   select: {
                     city: true,
                     region: true,
                     street: true,
                     info: true,
                   },
-                },
+                }, */
               },
             },
           },
@@ -228,14 +231,14 @@ export const verifyStore = async (
                 birthday: props.birthday || null,
                 info: props.info || null,
                 /* here i created new location for userInfo field its 1-1 relation */
-                location: {
-                  create: {
-                    city: props.location?.city || null,
-                    region: props.location?.region || null,
-                    street: props.location?.street || null,
-                    info: props.location?.info || null,
-                  },
-                },
+                // location: {
+                //   create: {
+                //     city: props.location?.city || null,
+                //     region: props.location?.region || null,
+                //     street: props.location?.street || null,
+                //     info: props.location?.info || null,
+                //   },
+                // },
               },
             },
           },
@@ -396,65 +399,40 @@ export const redirectOrder = async (
   }
 };
 export const findOrderByBarcode = async (barcode: string) => {
+  noStore();
   try {
     const order = await prisma.order.findUnique({
       where: { barcode },
-      select: {
-        barcode: true,
-        id: true,
+      include: {
+        Cities: true,
+        location: true,
+        OrderItems: {
+          include: {
+            Sku: true,
+          },
+        },
+        user: true,
       },
     });
 
     if (!order) {
       return undefined;
     }
-    const orderItems = await prisma.orderItem.findMany({
-      where: { orderId: order.id },
-      select: {
-        id: true,
-        price: true,
-        qty: true,
 
-        Sku: {
-          select: {
-            color: true,
-            nameOfColor: true,
-            Size: {
-              include: {
-                Product: {
-                  select: {
-                    barcode: true,
-                  },
-                },
-              },
-            },
-            /* product: {
-              select: {
-                barcode: true,
-              },
-            }, */
-          },
-        },
-      },
-    });
-    if (!orderItems) {
-      return undefined;
-    }
-    const data = { order, orderItems };
-    return data;
+    return order;
   } catch (error) {
     console.log(error);
     return undefined;
   }
 };
-/* cities */
-export const getCities = async () => {
+/* city */
+export const getcity = async () => {
   try {
-    const cities = await prisma.cities.findMany({});
-    if (!cities || cities.length === 0) {
+    const city = await prisma.city.findMany({});
+    if (!city || city.length === 0) {
       return [];
     }
-    return cities;
+    return city;
   } catch (error) {
     return [];
   }
@@ -462,7 +440,7 @@ export const getCities = async () => {
 
 export const getCityById = async (id: string) => {
   try {
-    const city = await prisma.cities.findUnique({
+    const city = await prisma.city.findUnique({
       where: { id: id },
     });
     if (!city) {
@@ -484,7 +462,7 @@ export const createCity = async (
   message: string;
 }> => {
   try {
-    const city = await prisma.cities.create({
+    const city = await prisma.city.create({
       data: {
         min,
         max,
@@ -512,7 +490,7 @@ export const updateCity = async (
   price: number
 ) => {
   try {
-    const city = await prisma.cities.update({
+    const city = await prisma.city.update({
       where: { id },
       data: {
         min,
@@ -534,7 +512,7 @@ export const updateCity = async (
 
 export const deleteCity = async (id: string) => {
   try {
-    const city = await prisma.cities.delete({
+    const city = await prisma.city.delete({
       where: { id },
     });
     if (!city) {
@@ -758,9 +736,13 @@ export const deletCategory = async ({
 };
 
 export const getAssembleRequests = async () => {
+  noStore();
   try {
     const requests = await prisma.assembleRequest.findMany({
       include: { assemble: true },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
     if (!requests) {
       return [];
@@ -770,4 +752,51 @@ export const getAssembleRequests = async () => {
     console.log(error);
     return [];
   }
+};
+export const getAssembleRequestById = async (id: string) => {
+  noStore();
+  try {
+    const requests = await prisma.assembleRequest.findUnique({
+      where: { id },
+      include: { assemble: true },
+    });
+    if (!requests) {
+      return undefined;
+    }
+    return requests;
+  } catch (error) {
+    console.log(error);
+    return undefined;
+  }
+};
+interface RequestInstance extends AssembleRequest {
+  readonly assemble: AssembleProduct[];
+}
+export const assemble = async (
+  status: $Enums.AssembleStatus,
+  request: RequestInstance
+) => {
+  if (status === "Done") return;
+  await prisma.assembleRequest.update({
+    where: { id: request.id },
+    data: {
+      status: "Done",
+    },
+  });
+  await Promise.all(
+    request.assemble.map(async (product) => {
+      return await prisma.sku.update({
+        where: { id: product.skuId },
+        data: {
+          qty: {
+            increment: product.qty,
+          },
+          newQty: {
+            decrement: product.qty,
+          },
+          verified: "Working",
+        },
+      });
+    })
+  );
 };

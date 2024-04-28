@@ -48,7 +48,7 @@ export type OrderItem = {
   price: number;
   qty: number;
   barcode: number;
-  color: string;
+
   colorName: string;
 };
 export const columns: ColumnDef<OrderItem>[] = [
@@ -98,14 +98,7 @@ export const columns: ColumnDef<OrderItem>[] = [
       return <div className="text-center font-medium">{barcode}</div>;
     },
   },
-  {
-    accessorKey: "color",
-    header: () => <div className="text-center">اللون</div>,
-    cell: ({ row }) => {
-      const color = row.getValue("color") as string;
-      return <div className="text-center font-medium">{color}</div>;
-    },
-  },
+
   {
     accessorKey: "colorName",
     header: () => <div className="text-center">اللون</div>,

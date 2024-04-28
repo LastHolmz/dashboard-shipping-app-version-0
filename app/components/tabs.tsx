@@ -2,7 +2,11 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+function checkLink(link: string, value: string): boolean {
+  const linkRegex = new RegExp(`/${value}(\/|$)`);
 
+  return linkRegex.test(link);
+}
 export default function Tabs({ children }: { children: React.ReactNode }) {
   return (
     <nav className="hidden md:flex items-center" dir="rtl">
@@ -24,7 +28,8 @@ export function TabItem({ href, content }: LinkProps) {
       <Link
         className={cn(
           "flex-center h-12 px-4",
-          pathname === `/${href}` || pathname.startsWith(`${href}/`)
+          // pathname === `/${href}` || pathname.startsWith(`${href}/`)
+          checkLink(pathname, href)
             ? "text-rose-900 dark:text-rose-600"
             : "dark:text-white text-black"
         )}

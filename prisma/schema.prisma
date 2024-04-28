@@ -33,31 +33,51 @@ model User {
   Order             Order[]
 }
 
+model Location {
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  info           String?
+  region         String?
+  name           String
+  street         String?
+  googleLocation String?
+  cityId         String?    @db.ObjectId
+  City           City?      @relation(fields: [cityId], references: [id])
+  userInfoId     String?    @db.ObjectId
+  UserInfo       UserInfo[]
+}
+
 model Order {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  OrderItems OrderItem[]
-  location   Location?
-  Cities     Cities?     @relation(fields: [citiesId], references: [id])
-  citiesId   String?     @db.ObjectId
-  items      Int?        @default(0)
-  totalPrice Int?        @default(0)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  state      OrderState? @default(UnderReview)
-  user       User?       @relation(fields: [userId], references: [id])
-  userId     String?     @db.ObjectId
-  barcode    String      @unique
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  orderItems  OrderItem[]
+  // locationId String
+  cityName    String
+  info        String?
+  Cities      City?       @relation(fields: [cityId], references: [id])
+  cityId      String      @db.ObjectId
+  items       Int         @default(0)
+  totalPrice  Int?        @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime?   @updatedAt
+  state       OrderState? @default(UnderReview)
+  user        User?       @relation(fields: [userId], references: [id])
+  userId      String?     @db.ObjectId
+  barcode     String      @unique
+  fullName    String
+  phoneNumber Int
+  readonly    Boolean     @default(true)
 }
 
 model OrderItem {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  productId String   @db.ObjectId
-  skuId     String[] @db.ObjectId
-  Sku       Sku      @relation(fields: [skuId], references: [id])
-  qty       Int
-  price     Int
-  Order     Order?   @relation(fields: [orderId], references: [id])
-  orderId   String?  @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  qty         Int
+  skuId       String  @db.ObjectId
+  productName String
+  colorName   String
+  price       Int
+  barcode     String
+  Order       Order?  @relation(fields: [orderId], references: [id])
+  orderId     String? @db.ObjectId
+  Sku         Sku     @relation(fields: [skuId], references: [id])
 }
 
 model UserInfo {
@@ -65,28 +85,19 @@ model UserInfo {
   verfivicationImgs String[]
   birthday          DateTime?
   info              String?
-  location          Location? @relation(fields: [locationId], references: [id])
   user              User?     @relation(fields: [userId], references: [id])
   userId            String?   @unique @db.ObjectId
-  locationId        String?   @unique @db.ObjectId
+  Location          Location? @relation(fields: [locationId], references: [id])
+  locationId        String[]  @db.ObjectId
   gender            Gender    @default(Man)
 }
 
-model Location {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  city           String?
-  region         String?
-  street         String?
-  info           String?
-  googleLocation String?
-  userInfo       UserInfo?
-  Order          Order?    @relation(fields: [orderId], references: [id])
-  orderId        String?   @unique @db.ObjectId
-}
+///
 
 model Store {
   id              String    @id @default(auto()) @map("_id") @db.ObjectId
   ads             Ads?
+  phone           Int?
   name            String
   logo            String?
   backgroundColor String?
@@ -140,6 +151,7 @@ model Product {
 model AssembleRequest {
   id        String            @id @default(auto()) @map("_id") @db.ObjectId
   assemble  AssembleProduct[]
+  storeId   String
   status    AssembleStatus    @default(Pending)
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
@@ -208,6 +220,7 @@ model Sku {
   qty         Int          @default(0)
   newQty      Int          @default(0)
   nameOfColor String       @default("تلقائي")
+  barcode     String       @unique
   OrderItems  OrderItem[]
 }
 
@@ -256,14 +269,17 @@ model Message {
   receiverId String? @unique @db.ObjectId
 }
 
-model Cities {
-  id     String  @id @default(auto()) @map("_id") @db.ObjectId
-  min    Int     @default(1)
-  max    Int     @default(3)
-  name   String
-  gender Gender  @default(Man)
-  price  Int     @default(5)
-  Order  Order[]
+model City {
+  id       String     @id @default(auto()) @map("_id") @db.ObjectId
+  min      Int        @default(1)
+  max      Int        @default(3)
+  name     String
+  gender   Gender     @default(Man)
+  price    Int        @default(5)
+  Order    Order[]
+  Location Location[]
+
+  @@map("City")
 }
 
 model Employee {

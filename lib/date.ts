@@ -8,5 +8,5 @@ export default function formatDate(date: Date, format: string): string {
     second: format.includes("ss") ? "2-digit" : undefined,
   };
 
-  return new Intl.DateTimeFormat("ar", options).format(date);
+  return new Intl.DateTimeFormat("en", { ...options }).format(date);
 }
